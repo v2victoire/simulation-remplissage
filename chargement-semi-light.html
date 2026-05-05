@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de Chargement Semi-Remorque</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f7;
+    --border: #e2e6f0;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --accent2: #059669;
+    --accent2-light: #d1fae5;
+    --accent3: #dc2626;
+    --accent3-light: #fee2e2;
+    --text: #1a2035;
+    --text-muted: #6b7a99;
+    --trailer-w: 2.4;
+    --trailer-l: 13.6;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    z-index: 10;
+  }
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  }
+  header h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+  header span { color: var(--text-muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+
+  /* Layout */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    min-height: calc(100vh - 61px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+    box-shadow: var(--shadow-sm);
+  }
+  .section-title {
+    font-size: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 18px 20px 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .palettes-list {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+  .palette-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .palette-row:hover { border-color: #bfcef5; box-shadow: var(--shadow-sm); }
+  .palette-info {}
+  .palette-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .palette-dims {
+    font-size: 0.67rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .qty-control {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface2);
+  }
+  .qty-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .qty-btn:hover { background: var(--border); color: var(--accent); }
+  .qty-input {
+    background: var(--surface);
+    border: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 28px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  .del-btn {
+    background: none;
+    border: none;
+    color: #cdd5e0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .del-btn:hover { color: var(--accent3); background: var(--accent3-light); }
+
+  /* Add custom palette */
+  .add-section {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .add-title {
+    font-size: 0.62rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .add-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .add-form input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  .add-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .add-form input::placeholder { color: #b0bace; }
+  .add-btn {
+    grid-column: 1 / -1;
+    background: var(--accent-light);
+    border: 1px solid #bfcef5;
+    color: var(--accent);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    border-radius: 7px;
+    padding: 8px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .add-btn:hover { background: #c7d8fd; border-color: #93b4fb; }
+
+  /* Compute button */
+  .compute-wrap {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .compute-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #1d4ed8);
+    border: none;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border-radius: 10px;
+    padding: 13px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  }
+  .compute-btn:hover { opacity: 0.93; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(37,99,235,0.4); }
+  .compute-btn:active { transform: translateY(0); }
+
+  /* Canvas area */
+  .canvas-area {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    overflow: auto;
+  }
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .stat {
+    padding: 14px 22px;
+    border-right: 1px solid var(--border);
+    flex: 1;
+  }
+  .stat-label {
+    font-size: 0.58rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-top: 3px;
+    color: var(--text);
+  }
+  .stat-value.ok { color: var(--accent2); }
+  .stat-value.warn { color: var(--accent3); }
+
+  /* Plan view */
+  .plan-wrap {
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .view-label {
+    font-size: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .trailer-container {
+    position: relative;
+    overflow: hidden;
+  }
+  canvas#planCanvas {
+    display: block;
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .legend-color {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    gap: 14px;
+    padding: 60px 40px;
+  }
+  .empty-icon { font-size: 3rem; opacity: 0.2; }
+  .empty-text { font-size: 0.85rem; text-align: center; line-height: 1.7; }
+
+  /* Rotation toggle */
+  .options-bar {
+    display: flex; gap: 10px; align-items: center;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .opt-label { font-size: 0.68rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .toggle {
+    position: relative;
+    width: 34px; height: 18px;
+    cursor: pointer;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #dde2ed;
+    border-radius: 18px;
+    transition: background 0.2s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle input:checked + .slider { background: var(--accent2); }
+  .toggle input:checked + .slider::before { transform: translateX(16px); }
+  .toggle-text { font-size: 0.72rem; color: var(--text); font-weight: 500; }
+
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { max-height: 50vh; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">🚛</div>
+  <div>
+    <h1>Plan de Chargement</h1>
+    <span>Semi-remorque 13,6 m · largeur 2,4 m</span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="section-title">Typologies de palettes</div>
+
+    <div class="options-bar">
+      <span class="opt-label">Options :</span>
+      <label class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" id="allowRotation" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-text">Rotation 90° autorisée</span>
+      </label>
+    </div>
+
+    <div class="palettes-list" id="palettesList"></div>
+
+    <div class="add-section">
+      <div class="add-title">+ Ajouter une typologie</div>
+      <div class="add-form">
+        <input type="text" id="newCode" placeholder="Code" maxlength="6">
+        <input type="number" id="newL" placeholder="L (m)" step="0.01" min="0.1">
+        <input type="number" id="newW" placeholder="l (m)" step="0.01" min="0.1">
+        <input type="number" id="newH" placeholder="H (m)" step="0.01" min="0">
+        <button class="add-btn" onclick="addCustomPalette()">Ajouter cette typologie</button>
+      </div>
+    </div>
+
+    <div class="compute-wrap">
+      <button class="compute-btn" onclick="compute()">▶ Générer le plan de chargement</button>
+    </div>
+  </aside>
+
+  <!-- Main canvas -->
+  <main class="canvas-area">
+    <div class="stats-bar" id="statsBar" style="display:none">
+      <div class="stat">
+        <div class="stat-label">Longueur utilisée</div>
+        <div class="stat-value" id="statLength">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Taux de remplissage</div>
+        <div class="stat-value" id="statFill">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Palettes placées</div>
+        <div class="stat-value" id="statPlaced">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Non placées</div>
+        <div class="stat-value" id="statUnplaced">—</div>
+      </div>
+    </div>
+
+    <div class="plan-wrap" id="planWrap">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📦</div>
+        <div class="empty-text">Entrez vos quantités de palettes<br>puis cliquez sur <strong style="color:var(--accent2)">Générer le plan</strong></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// === DATA ===
+const DEFAULT_PALETTES = [
+  { code: 'P06', l: 0.6,  w: 0.8,  h: null },
+  { code: 'P12', l: 1.2,  w: 0.8,  h: null },
+  { code: 'P2M', l: 1.2,  w: 2.0,  h: 1.00 },
+  { code: 'P61', l: 0.8,  w: 0.6,  h: 0.45 },
+  { code: 'P62', l: 0.8,  w: 0.6,  h: 0.75 },
+  { code: 'PAK', l: 0.6,  w: 0.4,  h: 0.30 },
+  { code: 'L02', l: 2.2,  w: 0.64, h: 0.70 },
+  { code: 'L23', l: 2.02, w: 1.2,  h: 0.96 },
+  { code: 'PA3', l: 1.2,  w: 0.8,  h: 1.05 },
+  { code: 'S03', l: 0.4,  w: 0.3,  h: 0.30 },
+  { code: 'S04', l: 0.6,  w: 0.4,  h: 0.30 },
+];
+
+const TRAILER_L = 13.6;
+const TRAILER_W = 2.4;
+
+let palettes = DEFAULT_PALETTES.map(p => ({ ...p, qty: 0 }));
+
+// Color palette for palettes
+const COLORS = [
+  '#f0c040','#4af0a0','#f06060','#60a0f0','#f080c0',
+  '#80f0f0','#f0a060','#a060f0','#f0f060','#60f080',
+  '#c0a0ff','#ff9080',
+];
+
+// === RENDER SIDEBAR ===
+function renderSidebar() {
+  const list = document.getElementById('palettesList');
+  list.innerHTML = '';
+  palettes.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'palette-row';
+    const dims = `${p.l}m × ${p.w}m${p.h ? ' × ' + p.h + 'm' : ''}`;
+    row.innerHTML = `
+      <div class="palette-info">
+        <div class="palette-code">${p.code}</div>
+        <div class="palette-dims">${dims}</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(${i}, -1)">−</button>
+        <input class="qty-input" type="number" min="0" value="${p.qty}" onchange="setQty(${i}, this.value)">
+        <button class="qty-btn" onclick="changeQty(${i}, 1)">+</button>
+      </div>
+      <button class="del-btn" title="Supprimer" onclick="removePalette(${i})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function changeQty(i, delta) {
+  palettes[i].qty = Math.max(0, palettes[i].qty + delta);
+  renderSidebar();
+}
+function setQty(i, val) {
+  palettes[i].qty = Math.max(0, parseInt(val) || 0);
+}
+function removePalette(i) {
+  palettes.splice(i, 1);
+  renderSidebar();
+}
+function addCustomPalette() {
+  const code = document.getElementById('newCode').value.trim().toUpperCase();
+  const l = parseFloat(document.getElementById('newL').value);
+  const w = parseFloat(document.getElementById('newW').value);
+  const h = parseFloat(document.getElementById('newH').value) || null;
+  if (!code || isNaN(l) || isNaN(w) || l <= 0 || w <= 0) {
+    alert('Veuillez remplir le code, la longueur et la largeur.');
+    return;
+  }
+  if (palettes.find(p => p.code === code)) {
+    alert('Ce code existe déjà.');
+    return;
+  }
+  palettes.push({ code, l, w, h, qty: 0 });
+  document.getElementById('newCode').value = '';
+  document.getElementById('newL').value = '';
+  document.getElementById('newW').value = '';
+  document.getElementById('newH').value = '';
+  renderSidebar();
+}
+
+// === PACKING ALGORITHM ===
+// Guillotine bin packing (first-fit, sorted by area desc)
+function pack(items, allowRotation) {
+  // items: [{code, l, w, colorIdx, id}]
+  // Returns placed: [{code, x, y, l, w, colorIdx, id}], unplaced: [...]
+  
+  // Free rectangles (x=depth along trailer length, y=width)
+  let freeRects = [{ x: 0, y: 0, l: TRAILER_L, w: TRAILER_W }];
+  const placed = [];
+  const unplaced = [];
+
+  for (const item of items) {
+    let best = null;
+    let bestScore = Infinity;
+    let bestRotated = false;
+    let bestRectIdx = -1;
+
+    const orientations = [
+      { l: item.l, w: item.w, rotated: false },
+    ];
+    if (allowRotation && Math.abs(item.l - item.w) > 0.001) {
+      orientations.push({ l: item.w, w: item.l, rotated: true });
+    }
+
+    for (let ri = 0; ri < freeRects.length; ri++) {
+      const rect = freeRects[ri];
+      for (const ori of orientations) {
+        if (ori.l <= rect.l + 0.001 && ori.w <= rect.w + 0.001) {
+          // Score: prefer leftmost (smallest x), then smallest waste
+          const score = rect.x * 1000 + (rect.l - ori.l);
+          if (score < bestScore) {
+            bestScore = score;
+            best = { x: rect.x, y: rect.y, l: ori.l, w: ori.w };
+            bestRotated = ori.rotated;
+            bestRectIdx = ri;
+          }
+        }
+      }
+    }
+
+    if (best === null) {
+      unplaced.push(item);
+      continue;
+    }
+
+    placed.push({ ...item, x: best.x, y: best.y, l: best.l, w: best.w, rotated: bestRotated });
+
+    // Split the used rect (Guillotine: max area split)
+    const usedRect = freeRects[bestRectIdx];
+    freeRects.splice(bestRectIdx, 1);
+
+    const rightW = usedRect.w - best.w;
+    const topL = usedRect.l - best.l;
+
+    // Two splits: right of placed, above placed
+    if (topL > 0.001) {
+      freeRects.push({ x: best.x + best.l, y: usedRect.y, l: topL, w: usedRect.w });
+    }
+    if (rightW > 0.001) {
+      freeRects.push({ x: usedRect.x, y: best.y + best.w, l: best.l, w: rightW });
+    }
+
+    // Merge/prune dominated rects
+    freeRects = freeRects.filter((r, i) => {
+      return !freeRects.some((r2, j) => j !== i &&
+        r2.x <= r.x && r2.y <= r.y &&
+        r2.x + r2.l >= r.x + r.l &&
+        r2.y + r2.w >= r.y + r.w
+      );
+    });
+  }
+
+  return { placed, unplaced };
+}
+
+// === COMPUTE & DRAW ===
+function compute() {
+  const allowRotation = document.getElementById('allowRotation').checked;
+
+  // Build item list
+  const items = [];
+  let colorIdx = 0;
+  const codeColorMap = {};
+
+  for (const p of palettes) {
+    if (p.qty <= 0) continue;
+    if (!codeColorMap[p.code]) {
+      codeColorMap[p.code] = COLORS[colorIdx % COLORS.length];
+      colorIdx++;
+    }
+    for (let i = 0; i < p.qty; i++) {
+      items.push({ code: p.code, l: p.l, w: p.w, color: codeColorMap[p.code] });
+    }
+  }
+
+  if (items.length === 0) {
+    alert('Veuillez entrer au moins une palette.');
+    return;
+  }
+
+  // Sort by area descending for better packing
+  items.sort((a, b) => (b.l * b.w) - (a.l * a.w));
+
+  const { placed, unplaced } = pack(items, allowRotation);
+
+  // Stats
+  let maxX = 0;
+  for (const p of placed) maxX = Math.max(maxX, p.x + p.l);
+  const usedArea = placed.reduce((s, p) => s + p.l * p.w, 0);
+  const totalArea = TRAILER_L * TRAILER_W;
+  const fillPct = ((usedArea / totalArea) * 100).toFixed(1);
+
+  document.getElementById('statsBar').style.display = 'flex';
+  const lenEl = document.getElementById('statLength');
+  const fillEl = document.getElementById('statFill');
+  lenEl.textContent = maxX.toFixed(2) + ' m';
+  fillEl.textContent = fillPct + '%';
+  lenEl.className = 'stat-value ' + (maxX <= TRAILER_L ? 'ok' : 'warn');
+  fillEl.className = 'stat-value ' + (parseFloat(fillPct) >= 70 ? 'ok' : '');
+  document.getElementById('statPlaced').textContent = placed.length;
+  const unplacedEl = document.getElementById('statUnplaced');
+  unplacedEl.textContent = unplaced.length;
+  unplacedEl.className = 'stat-value ' + (unplaced.length > 0 ? 'warn' : 'ok');
+
+  drawPlan(placed, unplaced, codeColorMap, maxX);
+}
+
+function drawPlan(placed, unplaced, codeColorMap, usedLength) {
+  const wrap = document.getElementById('planWrap');
+  wrap.innerHTML = '';
+
+  // Top view
+  const topDiv = document.createElement('div');
+  topDiv.innerHTML = '<div class="view-label">VUE DU DESSUS — Chargement (→ direction de chargement)</div>';
+
+  const PADDING = 24;
+  const maxW = Math.min(wrap.clientWidth - 48, 1200);
+  const scale = (maxW - PADDING * 2) / TRAILER_L;
+  const trailerPxL = TRAILER_L * scale;
+  const trailerPxW = TRAILER_W * scale;
+  const canvasW = trailerPxL + PADDING * 2;
+  const canvasH = trailerPxW + PADDING * 2 + 40;
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'planCanvas';
+  canvas.width = canvasW;
+  canvas.height = canvasH;
+  canvas.style.width = canvasW + 'px';
+  canvas.style.maxWidth = '100%';
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#f8fafd';
+  ctx.fillRect(0, 0, canvasW, canvasH);
+
+  // Trailer outline
+  const ox = PADDING, oy = PADDING + 30;
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(ox, oy, trailerPxL, trailerPxW);
+
+  // Trailer fill
+  ctx.fillStyle = 'rgba(37,99,235,0.03)';
+  ctx.fillRect(ox, oy, trailerPxL, trailerPxW);
+
+  // Grid lines every meter
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.lineWidth = 1;
+  for (let m = 1; m <= Math.floor(TRAILER_L); m++) {
+    const gx = ox + m * scale;
+    ctx.beginPath(); ctx.moveTo(gx, oy); ctx.lineTo(gx, oy + trailerPxW); ctx.stroke();
+  }
+
+  // Dimension labels
+  ctx.fillStyle = '#8896b3';
+  ctx.font = '500 10px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let m = 0; m <= Math.floor(TRAILER_L); m += 2) {
+    const gx = ox + m * scale;
+    ctx.fillText(m + 'm', gx, oy + trailerPxW + 14);
+  }
+  ctx.save();
+  ctx.translate(ox - 12, oy + trailerPxW / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('2,4 m', 0, 0);
+  ctx.restore();
+
+  // Used length indicator
+  if (usedLength < TRAILER_L) {
+    ctx.fillStyle = 'rgba(5,150,105,0.06)';
+    ctx.fillRect(ox, oy, usedLength * scale, trailerPxW);
+    ctx.strokeStyle = 'rgba(5,150,105,0.5)';
+    ctx.setLineDash([4, 3]);
+    ctx.lineWidth = 1.5;
+    const ux = ox + usedLength * scale;
+    ctx.beginPath(); ctx.moveTo(ux, oy); ctx.lineTo(ux, oy + trailerPxW); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(5,150,105,0.9)';
+    ctx.font = '600 10px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(usedLength.toFixed(2) + ' m', ux + 3, oy + 12);
+  }
+
+  // Draw placed palettes
+  for (const p of placed) {
+    const px = ox + p.x * scale;
+    const py = oy + p.y * scale;
+    const pw = p.l * scale;
+    const ph = p.w * scale;
+
+    // Fill
+    const col = p.color;
+    ctx.globalAlpha = 0.82;
+    ctx.fillStyle = col;
+    ctx.fillRect(px + 1, py + 1, pw - 2, ph - 2);
+    ctx.globalAlpha = 1;
+
+    // Border
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px + 1, py + 1, pw - 2, ph - 2);
+
+    // Label
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${Math.min(11, Math.max(7, ph * 0.3))}px Syne, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const label = p.rotated ? p.code + '↺' : p.code;
+    if (pw > 20 && ph > 10) {
+      ctx.fillText(label, px + pw / 2, py + ph / 2);
+    }
+  }
+  ctx.textBaseline = 'alphabetic';
+
+  topDiv.appendChild(canvas);
+  wrap.appendChild(topDiv);
+
+  // Legend
+  const legendDiv = document.createElement('div');
+  legendDiv.className = 'legend';
+  const seenCodes = new Set();
+  for (const p of placed) {
+    if (!seenCodes.has(p.code)) {
+      seenCodes.add(p.code);
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = `<div class="legend-color" style="background:${p.color}"></div><span>${p.code}</span>`;
+      legendDiv.appendChild(item);
+    }
+  }
+  wrap.appendChild(legendDiv);
+
+  // Unplaced warning
+  if (unplaced.length > 0) {
+    const counts = {};
+    for (const p of unplaced) counts[p.code] = (counts[p.code] || 0) + 1;
+    const msg = Object.entries(counts).map(([c, n]) => `${n}× ${c}`).join(', ');
+    const warn = document.createElement('div');
+    warn.style.cssText = 'background:rgba(240,96,96,0.1);border:1px solid rgba(240,96,96,0.4);border-radius:8px;padding:12px 16px;font-size:0.8rem;color:#f08080;font-family:JetBrains Mono,monospace;margin-top:8px;';
+    warn.innerHTML = `⚠ Palettes non placées (semi pleine) : ${msg}`;
+    wrap.appendChild(warn);
+  }
+
+  // Summary table
+  const tableWrap = document.createElement('div');
+  tableWrap.style.cssText = 'margin-top:16px;';
+  const tableLabel = document.createElement('div');
+  tableLabel.className = 'view-label';
+  tableLabel.textContent = 'RÉCAPITULATIF PAR TYPOLOGIE';
+  tableWrap.appendChild(tableLabel);
+
+  const table = document.createElement('table');
+  table.style.cssText = 'width:100%;border-collapse:collapse;font-family:JetBrains Mono,monospace;font-size:0.78rem;margin-top:8px;';
+  table.innerHTML = `
+    <tr style="color:var(--text-muted);border-bottom:1px solid var(--border);">
+      <th style="text-align:left;padding:6px 10px;">Typ.</th>
+      <th style="text-align:right;padding:6px 10px;">Demandées</th>
+      <th style="text-align:right;padding:6px 10px;">Placées</th>
+      <th style="text-align:right;padding:6px 10px;">Refusées</th>
+      <th style="text-align:right;padding:6px 10px;">m² utilisés</th>
+    </tr>
+  `;
+  const placedByCode = {};
+  for (const p of placed) placedByCode[p.code] = (placedByCode[p.code] || 0) + 1;
+  const unplacedByCode = {};
+  for (const p of unplaced) unplacedByCode[p.code] = (unplacedByCode[p.code] || 0) + 1;
+
+  for (const p of palettes) {
+    if (p.qty === 0) continue;
+    const pl = placedByCode[p.code] || 0;
+    const un = unplacedByCode[p.code] || 0;
+    const area = (pl * p.l * p.w).toFixed(2);
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border)';
+    tr.innerHTML = `
+      <td style="padding:7px 10px;font-weight:600;color:${codeColorMap[p.code] || 'var(--text)'};">${p.code}</td>
+      <td style="padding:7px 10px;text-align:right;color:var(--text-muted);">${p.qty}</td>
+      <td style="padding:7px 10px;text-align:right;color:var(--accent2);">${pl}</td>
+      <td style="padding:7px 10px;text-align:right;color:${un > 0 ? 'var(--accent3)' : 'var(--text-muted)'};">${un}</td>
+      <td style="padding:7px 10px;text-align:right;">${area} m²</td>
+    `;
+    tableWrap.appendChild(table);
+    table.appendChild(tr);
+  }
+  tableWrap.appendChild(table);
+
+  const totalArea = placed.reduce((s, p) => s + p.l * p.w, 0);
+  const totRow = document.createElement('tr');
+  totRow.innerHTML = `
+    <td style="padding:7px 10px;font-weight:700;color:var(--text);">TOTAL</td>
+    <td style="padding:7px 10px;text-align:right;font-weight:700;">${palettes.reduce((s,p)=>s+p.qty,0)}</td>
+    <td style="padding:7px 10px;text-align:right;font-weight:700;color:var(--accent2);">${placed.length}</td>
+    <td style="padding:7px 10px;text-align:right;font-weight:700;color:${unplaced.length>0?'var(--accent3)':'var(--text-muted)'};">${unplaced.length}</td>
+    <td style="padding:7px 10px;text-align:right;font-weight:700;">${totalArea.toFixed(2)} m²</td>
+  `;
+  table.appendChild(totRow);
+
+  wrap.appendChild(tableWrap);
+}
+
+// === INIT ===
+renderSidebar();
+</script>
+</body>
+</html>
